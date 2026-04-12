@@ -41,12 +41,12 @@ const config = computed( () => {
         return null;
     }
 
-    const { Essentials, Paragraph, Bold, Italic } = cloud.data.value.CKEditor;
+    const { Essentials, Paragraph, Bold, Italic, Code, FontSize, Highlight, HtmlEmbed } = cloud.data.value.CKEditor;
 
     return {
-        licenseKey: 'eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3NjU2NzAzOTksImp0aSI6ImFjNjBkYWRjLTMzZWUtNDJmYy1hNDg2LTQ5Yzc0Y2ZiNjEzZSIsInVzYWdlRW5kcG9pbnQiOiJodHRwczovL3Byb3h5LWV2ZW50LmNrZWRpdG9yLmNvbSIsImRpc3RyaWJ1dGlvbkNoYW5uZWwiOlsiY2xvdWQiLCJkcnVwYWwiXSwiZmVhdHVyZXMiOlsiRFJVUCIsIkJPWCJdLCJ2YyI6ImZlYjYzMjJiIn0.yQZJkHb2mtXjt4h7u2f4YeEWMxlMcy2heH7NV18Plnu45IVELGpIPC9eUlB7vnEnvQmApo1RFqqVb7cAcdxDVw',
-        plugins: [ Essentials, Paragraph, Bold, Italic, ],
-        toolbar: [ 'undo', 'redo', '|', 'bold', 'italic', '|',]
+        licenseKey: 'eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE4MDc1NzQzOTksImp0aSI6IjVjOTBmODVhLWM5ZmEtNDc2YS1hNmFkLTA3MTM5ZGI3NTE5OCIsImxpY2Vuc2VkSG9zdHMiOlsiMTI3LjAuMC4xIiwibG9jYWxob3N0IiwiMTkyLjE2OC4qLioiLCIxMC4qLiouKiIsIjE3Mi4qLiouKiIsIioudGVzdCIsIioubG9jYWxob3N0IiwiKi5sb2NhbCJdLCJ1c2FnZUVuZHBvaW50IjoiaHR0cHM6Ly9wcm94eS1ldmVudC5ja2VkaXRvci5jb20iLCJkaXN0cmlidXRpb25DaGFubmVsIjpbImNsb3VkIiwiZHJ1cGFsIl0sImxpY2Vuc2VUeXBlIjoiZGV2ZWxvcG1lbnQiLCJmZWF0dXJlcyI6WyJEUlVQIiwiRTJQIiwiRTJXIl0sInJlbW92ZUZlYXR1cmVzIjpbIlBCIiwiUkYiLCJTQ0giLCJUQ1AiLCJUTCIsIlRDUiIsIklSIiwiU1VBIiwiQjY0QSIsIkxQIiwiSEUiLCJSRUQiLCJQRk8iLCJXQyIsIkZBUiIsIkJLTSIsIkZQSCIsIk1SRSJdLCJ2YyI6IjJiYjRkYzQ5In0.4WsP1yHb_M7Tw9h-DMgt0aJKXsxdAO-ez9gz2JpVSGXeME1R0et4xmpJVprhmMhJVMP70oJk6prOBrmsTAS7rA',
+        plugins: [ Essentials, Paragraph, Bold, Italic, Code, FontSize, Highlight, HtmlEmbed],
+        toolbar: [ 'undo', 'redo', '|', 'bold', 'italic', '|', 'code', 'fontSize', 'highlight', 'HtmlEmbed']
     };
 } );
 </script>
