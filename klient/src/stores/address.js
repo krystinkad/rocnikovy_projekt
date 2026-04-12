@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-/* pro web
+//pro web
 export const serverAddress = defineStore('serverAddress', {
     state: () => {
         return {
@@ -8,13 +8,13 @@ export const serverAddress = defineStore('serverAddress', {
         }
     }
 })
- */ 
+ 
 
 //pro localhost
-export const serverAddress = defineStore('serverAddress', {
+/* export const serverAddress = defineStore('serverAddress', {
     state: () => {
         return {
             address: "http://localhost:5174"
         }
     }
-})
+}) */
