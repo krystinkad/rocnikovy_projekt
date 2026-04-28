@@ -1,0 +1,686 @@
+openapi: 3.0.0
+info:
+  title: Kořínek LDT
+  version: 1.0.0
+  description: Kořínek API
+
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/DREVIKOVSKAKRISTYNA/dawdw/1.0.0
+  - url: http://korinekldt.cz
+
+paths:
+  /login:
+    post:
+      tags: [auth]
+      summary: User login
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  description: User name used for authentication (maps to DB field "name")
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: JWT token returned on successful login
+          content:
+            application/json:
+              schema:
+                type: string
+                description: JWT access token
+        '404':
+          description: Invalid username or password
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid username or password
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Internal server error
+
+  # =====================================================
+  # FILES (FEfiles + uploadFiles)
+  # =====================================================
+
+  /getFiles:
+    get:
+      tags: [files]
+      summary: Get all files
+      operationId: getFiles
+      responses:
+        '200':
+          description: List of files
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    createdAt:
+                      type: string
+                      format: date-time
+                    updatedAt:
+                      type: string
+                      format: date-time
+        '404':
+          description: Files not found or error occurred
+
+  /downloadFile/{filePath}:
+    get:
+      tags: [files]
+      summary: Download file by file path
+      operationId: downloadFile
+      parameters:
+        - in: path
+          name: filePath
+          required: true
+          description: Name of the file to download (relative file name inside server storage)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: File downloaded successfully
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '403':
+          description: Access denied (invalid file path)
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Přístup odepřen.
+        '500':
+          description: Server error during file download
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Chyba při stahování souboru.
+
+  /uploadFile/{name}:
+    post:
+      tags: [files]
+      summary: Upload file
+      operationId: uploadFile
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: File uploaded
+
+  /deleteFile:
+    delete:
+      tags: [files]
+      summary: Delete file
+      operationId: deleteFile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [file_id]
+              properties:
+                file_id:
+                  type: integer
+      responses:
+        '200':
+          description: File deleted
+
+  # =====================================================
+  # ARTICLES
+  # =====================================================
+
+  /getYears:
+    get:
+      tags: [articles]
+      summary: Get all years (turnus records)
+      operationId: getYears
+      responses:
+        '200':
+          description: List of years
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    year:
+                      type: integer
+                    name:
+                      type: string
+        '404':
+          description: Not found or error occurred
+
+  /getArticles/{year}:
+    get:
+      tags: [articles]
+      summary: Get articles by year
+      operationId: getArticlesByYear
+      parameters:
+        - in: path
+          name: year
+          required: true
+          description: Year ID used to filter articles (mapped to year_id in DB)
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of articles for given year
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
+                    content:
+                      type: string
+                    year_id:
+                      type: integer
+        '404':
+          description: Not found or error occurred
+
+  /getArticleContent/{article_id}:
+    get:
+      tags: [articles]
+      summary: Get article content by ID
+      operationId: getArticleContent
+      parameters:
+        - in: path
+          name: article_id
+          required: true
+          description: ID of the article
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Article content (or null if not found)
+          content:
+            application/json:
+              schema:
+                type: object
+                nullable: true
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  content:
+                    type: string
+                  year_id:
+                    type: integer
+        '404':
+          description: Not found or error occurred
+
+  /uploadArticle:
+    post:
+      tags: [articles]
+      summary: Upload article
+      operationId: uploadArticle
+      parameters:
+        - name: header
+          required: true
+          schema:
+            type: string
+        - name: year_id
+          required: true
+          schema:
+            type: integer
+        - name: day
+          required: false
+          schema:
+            type: integer
+        - name: content
+          required: false
+          schema:
+            type: string
+      
+  /editArticle:
+    patch:
+      tags: [articles]
+      summary: Edit article
+      operationId: editArticle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id]
+              properties:
+                id:
+                  type: integer
+                  description: ID of the article to update
+                header:
+                  type: string
+                year_id:
+                  type: integer
+                day:
+                  type: integer
+                content:
+                  type: string
+      responses:
+        '200':
+          description: Article updated successfully
+        '404':
+          description: Article not found or update failed
+        '500':
+          description: Internal server error
+
+  /deleteArticle:
+    delete:
+      tags: [articles]
+      summary: Delete article
+      operationId: deleteArticle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [delete_id]
+              properties:
+                delete_id:
+                  type: integer
+                  description: ID of the article to delete
+      responses:
+        '200':
+          description: Article deleted successfully
+        '404':
+          description: Article not found or deletion failed
+        '500':
+          description: Internal server error
+
+  # =====================================================
+  # PHOTOS
+  # =====================================================
+
+  /uploadPhotos/{id}:
+    post:
+      tags: [photos]
+      summary: Upload multiple photos
+      operationId: uploadPhotos
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [photos]
+              properties:
+                photos:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '200':
+          description: Photos uploaded
+
+  /getPhotos/{article}:
+    get:
+      tags: [photos]
+      summary: Get photos by article ID
+      operationId: getPhotosByArticle
+      parameters:
+        - in: path
+          name: article
+          required: true
+          description: Article ID used to fetch related photos
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of photos for the given article
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    article_id:
+                      type: integer
+                    url:
+                      type: string
+                    createdAt:
+                      type: string
+                      format: date-time
+        '404':
+          description: Not found or error occurred
+
+  /deleteImages:
+    delete:
+      tags: [photos]
+      summary: Delete photos
+      operationId: deleteImages
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [photos]
+              properties:
+                photos:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      photoId:
+                        type: integer
+
+  # =====================================================
+  # MESSAGES
+  # =====================================================
+
+  /getMessages:
+    get:
+      tags: [messages]
+      summary: Get all messages
+      operationId: getMessages
+      responses:
+        '200':
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    content:
+                      type: string
+                    createdAt:
+                      type: string
+                      format: date-time
+        '404':
+          description: Not found or error occurred
+
+  /sendMessage:
+   post:
+    tags: [messages]
+    summary: Send a new message
+    operationId: sendMessage
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [childName, messageContent]
+            properties:
+              childName:
+                type: string
+                description: Name of the child sending the message
+              messageContent:
+                type: string
+                description: Content of the message
+    responses:
+      '200':
+        description: Message created successfully
+      '404':
+        description: Message creation failed
+      '500':
+        description: Internal server error    
+         
+
+  /deleteMessage:
+    delete:
+      tags: [messages]
+      summary: Delete message
+      operationId: deleteMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message_id]
+              properties:
+                message_id:
+                  type: integer
+                  description: ID of the message to delete
+      responses:
+        '200':
+          description: Message deleted successfully
+        '404':
+          description: Message not found or deletion failed
+        '500':
+          description: Internal server error
+
+  /deleteAllMessages:
+      delete:
+        tags: [messages]
+        summary: Delete all messages
+        operationId: deleteAllMessages
+        responses:
+          '200':
+            description: All messages deleted successfully
+          '404':
+            description: Not found or deletion failed
+          '500':
+            description: Internal server error
+
+  # =====================================================
+  # NEWS
+  # =====================================================
+
+  /createNews:
+    post:
+      tags: [news]
+      summary: Create news
+      operationId: createNews
+      parameters:
+        - name: news_date
+          required: true
+          schema:
+            type: DateTime
+        - name: content
+          required: true
+          schema:
+            type: string
+
+  /getNews:
+    get:
+      tags: [news]
+      summary: Get all news
+      operationId: getNews
+      responses:
+        '200':
+          description: List of news
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
+                    content:
+                      type: string
+                    createdAt:
+                      type: string
+                      format: date-time
+
+  /deleteNews:
+    delete:
+      tags: [news]
+      summary: Delete news item
+      operationId: deleteNews
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [delete_id]
+              properties:
+                delete_id:
+                  type: integer
+                  description: ID of the news item to delete
+      responses:
+        '200':
+          description: News deleted successfully
+        '404':
+          description: News not found or deletion failed
+        '500':
+          description: Internal server error
+
+  # =====================================================
+  # CONFIG
+  # =====================================================
+
+  /getTime:
+    get:
+      tags: [settings]
+      summary: Get start time configuration
+      operationId: getTime
+      responses:
+        '200':
+          description: Configuration value for start time
+          content:
+            application/json:
+              schema:
+                type: object
+                nullable: true
+                properties:
+                  id:
+                    type: integer
+                  key:
+                    type: string
+                    example: startTime
+                  value:
+                    type: string
+        '404':
+          description: Configuration not found or error occurred
+
+
+  /createTurnus:
+    post:
+      tags: [settings]
+      summary: Create turnus
+      operationId: createTurnus
+      parameters:
+        - name: location
+          required: true
+          schema:
+            type: string
+        - name: turnus_year
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Turnus vytvořen.
+          content:
+            'application/json': {}
+            'application/xml': {}
+
+  /createUser:
+    post:
+      tags: [settings]
+      summary: Create user
+      operationId: createUser
+      parameters:
+        - name: name
+          required: true
+          schema:
+            type: string
+        - name: passHash
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Uživatel vytvořen.
+          content:
+            'application/json': {}
+            'application/xml': {}
+      
+  /editTime:
+    patch:
+      tags: [settings]
+      summary: Edit start time
+      operationId: editTime
+      parameters:
+        - name: start_time
+          required: true
+          schema:
+            type: DateTime
+      responses:
+        '200':
+          description: Čas upraven.
+          content:
+            'application/json': {}
+            'application/xml': {}
+        '400':
+          description: Time required.
+          content:
+            'application/json': {}
+            'application/xml': {}
