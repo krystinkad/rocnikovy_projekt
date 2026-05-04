@@ -169,3 +169,11 @@ Fotografie jsou ukládány do složek podle turnusu a článků.
 
 - Pokud se změny neprojeví, zkuste obnovit stránku
 - Při chybě nahrávání zkontrolujte formát souboru
+
+## Spuštění
+- pro dev spuštění proveďte následující akce:
+   - npm install (ve všech složkách)
+   - npm run run (pro server)
+   - npm run dev (pro klient či administraci)
+- pro vytvoření build verze:
+   - npm run build (pro klient či administraci)
